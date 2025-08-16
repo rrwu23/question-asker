@@ -260,14 +260,14 @@ function go_next(){
 
 function reset(){
     if (confirm('reset ?')){
-        q.i = 0;
         q.r = [];
-        correctness = 0;
+        correctness = 100;
 
-        q.update();
+        up(0)
 
     } else{
         return
     }
 }
+
 
