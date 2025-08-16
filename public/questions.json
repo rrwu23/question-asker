@@ -1,7 +1,7 @@
 {
         "time": {
     "If school starts at 8:15 AM and lasts 6 hours 45 minutes, what time does it end?": "3:00 PM",
-    "What is 38 minutes past 9:57 PM": "10:35 pm", "if the school ends at 3:25 PM and the after-school program finishes 2 hours 17 minutes after the school ends?": "5:42 PM",
+    "What is 38 minutes past 9:57 PM": "10:35 pm", "if the school ends at 3:25 PM and the after-school program finishes 2 hours 17 minutes after the school ends. When does the after school program ends?": "5:42 PM",
   "A movie starts at 6:30 PM and lasts 2 hours 50 minutes. What time does it finish?": "9:20 PM",
   "You leave your house at 7:40 AM. The drive takes 55 minutes. What time do you arrive?": "8:35 AM",
   "A train departs at 2:15 PM and the journey lasts 3 hours 40 minutes. What time does it arrive?": "5:55 PM",
@@ -85,7 +85,21 @@
   "A train departs at 8:10 AM and the journey takes 3 hours 35 minutes. Arrival time?": "11:45 AM",
   "You leave at 9:25 AM for a 2 hour 40 minute drive. When do you arrive?": "12:05 PM",
   "A lecture starts at 1:50 PM and lasts 1 hour 45 minutes. When does it end?": "3:35 PM",
-  "If a bus leaves at 7:15 AM and arrives at 9:50 AM, how long was the trip?": "2 hours 35 minutes"
+  "If a bus leaves at 7:15 AM and arrives at 9:50 AM, how long was the trip?": "2 hours 35 minutes",
+  "If school starts at 7:55 AM and lasts 5 hours 35 minutes, what time does it end?": "1:30 PM",
+  "A train leaves at 10:25 AM and travels for 2 hours 45 minutes. What time does it arrive?": "1:10 PM",
+  "You start reading at 6:40 PM and stop 1 hour 32 minutes later. What time do you finish?": "8:12 PM",
+  "A bus departs at 3:15 PM and the ride is 1 hour 20 minutes. What time does it arrive?": "4:35 PM",
+  "If lunch is at 12:20 PM and dinner is 6 hours 10 minutes later, what time is dinner?": "6:30 PM",
+  "A class begins at 9:10 AM and lasts 2 hours 25 minutes. What time does it end?": "11:35 AM",
+  "The movie begins at 7:45 PM and runs for 2 hours 18 minutes. What time does it finish?": "10:03 PM",
+  "You leave work at 5:05 PM and drive home for 48 minutes. What time do you arrive home?": "5:53 PM",
+  "If a meeting starts at 11:15 AM and ends 1 hour 42 minutes later, what time does it end?": "12:57 PM",
+  "A concert starts at 6:55 PM and lasts 3 hours 5 minutes. What time does it end?": "10:00 PM",
+  "The flight leaves at 8:40 AM and lasts 5 hours 20 minutes. What time does it arrive?": "2:00 PM",
+  "Breakfast is at 8:25 AM and the snack is 4 hours 50 minutes later. What time is the snack?": "1:15 PM",
+  "You begin playing a game at 2:30 PM and stop 2 hours 47 minutes later. What time do you finish?": "5:17 PM",
+  "A lecture starts at 1:05 PM and continues for 95 minutes. What time does it end?": "2:40 PM"
         }
 
     }
