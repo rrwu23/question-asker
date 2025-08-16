@@ -70,13 +70,16 @@ class GENQ {
         })
     }
 
-    static selAllSubEl(arr, idx){
+    static selAllSubEl(arr, idx, val){
         var res = [];
         for (const i of arr){
             console.log('[debug]'+i)
-            res.push(i[idx]);
+            if(i[idx] == val){
+                res.push(i)
+            }
+        
         }
-        return res;
+    return res;
     }
 
     static sum(arr){
@@ -102,7 +105,7 @@ class question_asker {
 
     cal(){
         if(this.r.length != 0){
-            correctness = Math.round(GENQ.sum(GENQ.selAllSubEl(this.r, 1))/this.r.length*100);
+            correctness = Math.round(GENQ.selAllSubEl(this.r, 1, 1).length/this.r.length*100);
         }
         
     }
@@ -127,7 +130,6 @@ class question_asker {
 
     removeExtra(){
 
-        //console.log(GENQ.selAllSubEl(this.r , 0));
         this.r = GENQ.hasAndRemoveSUB(this.r, 0)
         
     }
@@ -137,8 +139,8 @@ class question_asker {
         $('.wc').removeClass('green');
         $('.wc').removeClass('white');
         console.log(q)
-        if (this.r[this.i] != undefined){
-            if (this.r[this.i][1] == 0){
+        if (JSON.stringify(GENQ.selAllSubEl(this.r, 0, this.i)) != JSON.stringify([])){
+            if (GENQ.selAllSubEl(this.r, 0, this.i)[0][1] == 0){
                 $('.wc').addClass('red');
             }
 
@@ -158,8 +160,8 @@ class question_asker {
         this.cal()
         $('.correctness').html('correctness: ' + correctness + '%')
         $('.qd').html('questions done: ' + this.r.length)
-        if (this.r[this.i]){
-            if (this.r[this.i][1] == 1){
+        if (JSON.stringify(GENQ.selAllSubEl(this.r, 0, this.i)) != JSON.stringify([])){
+            if (GENQ.selAllSubEl(this.r, 0, this.i)[0][1] === 1){
                 $('.gb').html('status: correct');
             } else{
                 $('.gb').html('correct anwser: ' + this.q[this.i][1])
@@ -219,24 +221,31 @@ function up(n){
     q.update();
 }
 
+$('#lol').html('1-20');
+
 $('#d1').click(()=>{
     up(0)
+    $('#lol').html('1-20');
 })
 
 $('#d2').click(()=>{
-    up(20)
+    up(20);
+    $('#lol').html('21-40');
 })
 
 $('#d3').click(()=>{
-    up(40)
+    up(40);
+    $('#lol').html('14-60');
 })
 
 $('#d4').click(()=>{
     up(60)
+    $('#lol').html('61-80');
 })
 
 $('#d5').click(()=>{
     up(80)
+    $('#lol').html('81-100');
 })
 
 function go_back(){
