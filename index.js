@@ -203,8 +203,9 @@ $('.submit').click(()=>{
 
 function up(n){
     $('.questiona').html('');
-    q.i = n;
-    
+    if (n < 100 && n=>0){
+        q.i = n;
+    }    
     if (n===0){
         $('.back').css('visibility', 'hidden')
     } else{
@@ -269,5 +270,6 @@ function reset(){
         return
     }
 }
+
 
 
