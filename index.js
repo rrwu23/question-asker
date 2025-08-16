@@ -203,7 +203,7 @@ $('.submit').click(()=>{
 
 function up(n){
     $('.questiona').html('');
-    if (n < 100 && n=>0){
+    if (n < 100 && n>=0){
         q.i = n;
     }    
     if (n===0){
@@ -270,6 +270,7 @@ function reset(){
         return
     }
 }
+
 
 
 
