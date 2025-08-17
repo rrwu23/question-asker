@@ -4,7 +4,7 @@
     "What is 38 minutes past 9:57 PM": "10:35 pm", "if the school ends at 3:25 PM and the after-school program finishes 2 hours 17 minutes after the school ends. When does the after school program ends?": "5:42 PM",
   "A movie starts at 6:30 PM and lasts 2 hours 50 minutes. What time does it finish?": "9:20 PM",
   "You leave your house at 7:40 AM. The drive takes 55 minutes. What time do you arrive?": "8:35 AM",
-  "A train departs at 2:15 PM and the journey lasts 3 hours 40 minutes. What time does it arrive?": "5:55 PM",
+  "A train departs at 2:15 PM and the train ride lasts 3 hours 40 minutes. What time does it arrive?": "5:55 PM",
   "If breakfast is at 7:30 AM and lunch is 5 hours 15 minutes later, what time is lunch?": "12:45 PM",
   "A football match starts at 4:20 PM and lasts 1 hour 50 minutes. What time does it end?": "6:10 PM",
   "School starts at 9:00 AM. The first class lasts 1 hour 40 minutes. What time does the first class end?": "10:40 AM",
@@ -100,6 +100,7 @@
   "Breakfast is at 8:25 AM and the snack is 4 hours 50 minutes later. What time is the snack?": "1:15 PM",
   "You begin playing a game at 2:30 PM and stop 2 hours 47 minutes later. What time do you finish?": "5:17 PM",
   "A lecture starts at 1:05 PM and continues for 95 minutes. What time does it end?": "2:40 PM"
+  
         }
 
     }
