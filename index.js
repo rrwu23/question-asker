@@ -10,35 +10,45 @@ class GENQ {
 
     static async load(){
         if (!GENQ.questionDB){
-          var res = await fetch('./public/questions.json');
-          GENQ.questionDB = await res.json();
-          GENQ.questionDB = GENQ.questionDB.time
+            try{
+                var res = await fetch('./public/questions.json');
+                if (!res.ok){
+                    throw new Error('ahhhhhh'+res.status)
+                }
+                GENQ.questionDB = await res.json();
+            } catch{
+                console.log('failed to load questions.json');
+
+                GENQ.questionDB = {'time': {}}
+            }
         }   
     }
-    static slice(idx, str)
-    {
+    //--------------------methods/ functions in sleep:------------------------//
+    // static slice(idx, str)
+    // {
 
-    }
+    // }
 
     
 
-    static gen_q1(){
-        var a = 1+Math.floor(Math.random()*1000);
-        var b = 1+Math.floor(Math.random()*1000);
-        var c = 1+Math.floor(Math.random()*1000);
-        var d = 1+Math.floor(Math.random()*1000);
-        var o = _.sampleSize(opers, 3);
-        return `${a} ${o[0]} ${b} ${o[1]} ${c} ${o[2]} ${d}`;
+    // static gen_q1(){
+    //     var a = 1+Math.floor(Math.random()*1000);
+    //     var b = 1+Math.floor(Math.random()*1000);
+    //     var c = 1+Math.floor(Math.random()*1000);
+    //     var d = 1+Math.floor(Math.random()*1000);
+    //     var o = _.sampleSize(opers, 3);
+    //     return `${a} ${o[0]} ${b} ${o[1]} ${c} ${o[2]} ${d}`;
         
-    }
+    // }
 
-    static gen_q2(){
+    // static gen_q2(){
 
-    }
+    // }
 
-    static filter(){
+    // static filter(){
         
-    }
+    // }
+    //--------------------------------------------------------------------------//
 
     static ReplaceRepeatedItemsFromSubArr(arr, idx, replaceIdx) {
         let map = new Map();
@@ -102,11 +112,11 @@ class GENQ {
 class question_asker {
 
     constructor (){
-        this.question = GENQ.questionDB;
+        this.question = GENQ.questionDB.time;
         this.r=[];
         this.i = 0
         this.q = Object.entries(this.question) 
-        this.correctness = 100;
+        this.correctness = '"cannot calculate" ';
         this.attempt = new Map();
     }
     //the class constructor
@@ -227,7 +237,7 @@ $('.submit').click(()=>{
 
 //--------------------------------------//
 function up(n){
-    if (parseInt(n) != NaN && parseInt(n) != parseFloat(n)){
+    if (Number.isNaN(n) || !Number.isInteger(n)){
         return;
     }
     $('.questiona').html('');
@@ -309,3 +319,4 @@ function reset(){
         return
     }
 }
+
