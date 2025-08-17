@@ -9,8 +9,10 @@
 }
 
 .anwserer{
+    font-size: 10px;
     transition: all ease;
     transform: scale(3);
+    width: 150px;
 }
 
 @media (max-width: 500px){
