@@ -27,16 +27,11 @@
 <body>
 <div class="container">
     <div class="main">
-        <div class="sel">
-        <div id="d1">day 1 : 1-20</div>
-        <div id="d2">day 2 : 21-40</div>
-        <div id="d3">day 3 : 41-60</div>
-        <div id="d4">day 4 :61-80</div>
-        <div id="d5">day 5 : 81-100</div>
-        </div>
+        
+        <em class="bold">GO TO QUESTION</em><div class="nav"><input type="text" class="interval" name="inter"><input type="submit" value="GO!" class="go"></div>
         <h2 class="questiona"></h2>
         <div class="wc"></div>
-        <input id="null" placeholder="xx:xx AM/PM format" autocomplete="off">
+        <input id="null" class="anwserer" placeholder="xx:xx AM/PM format" autocomplete="off">
 
         <div class="gridy">
             <button class="back" onclick="go_back()">back</button>
@@ -47,18 +42,24 @@
 
     </div>
 
-    <div class = sub><h1 id="lol">21 - 40<br>
+    <div class = sub>
      </h1><br><p id="ok">question: </p><br>
     <p class="correctness">correctness: 100%</p>
     <p class="qd">questions done: 0</p>
     <p class="gb">status: none </p>
+    <p class="trys">attempt: 0</p>
 
 </div>
     
-
+<footer class="bold" style="font-family: Courier, monospace;">author: rrwu23
+    <img src="assets/rr.jpg" height="100">
+    <br>
+    version: v1.0.0
+</footer>
 </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="index.js"></script>
 </body>
-
 </html>
+
+
