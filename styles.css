@@ -8,25 +8,25 @@
     grid-row: span 2;
 }
 
-input{
+.anwserer{
     transition: all ease;
     transform: scale(3);
 }
 
 @media (max-width: 500px){
-    input{
+    .anwserer{
         transform: scale(2);
     }
 
 }
 
 @media (max-width: 350px){
-    input{
+    .anwserer{
         transform: scale(1);
     }
 }
 
-input{
+.anwserer{
     border: 5px solid black;
     border-radius: 50px;
     text-align: center;
@@ -123,4 +123,46 @@ button:active{
 
 .green{
     background-color: greenyellow;
+}
+
+.interval{
+    color: #030011;
+    width: 60px;
+    height: 30px;
+    font-size: 30px;
+    text-align: center;
+    text-decoration: underline dashed rgb(0, 0, 73);
+    border-radius: 5px;
+    border: #030011 solid 2px;
+
+}
+
+.nav{
+    
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+}
+
+.go{
+    background: linear-gradient(to right, rgb(184, 168, 255), rgb(223, 220, 255));
+    color: rgb(0, 0, 0);
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 20px;
+    transition: all 0.1s ease;
+}
+
+.go:hover{
+    
+    color: rgb(230, 231, 255);
+    background: linear-gradient(to right, rgb(24, 0, 133), rgb(22, 0, 218));
+}
+.bold{
+    font-weight: 700;
+}
+
+footer{
+    background-color: black;
+    color: greenyellow                   ;
 }
