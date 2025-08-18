@@ -227,6 +227,7 @@ class question_asker {
             $('.wc').css('display', 'none')
             $('.qd').css('display', 'none');
             $('.trys').css('display', 'none');
+            
         } else if (this.mode == 'practice'){
             $('.g').css('visibility', 'hidden');
             $('.restart').css('display', 'block');
@@ -234,6 +235,9 @@ class question_asker {
             $('.wc').css('display', 'block');
             $('.qd').css('display', 'block');
             $('.trys').css('display', 'block');
+            $('.sheet').css('display', 'none');
+            $('sheet').html('');
+            $('.submit').css('visibility', 'visible')
         }
 
     } 
@@ -270,7 +274,7 @@ class question_asker {
         $('.wc').removeClass('red');
         $('.wc').removeClass('green');
         $('.wc').removeClass('white');
-
+        console.log('called')
         //updates the ui after q is updated
         this.update_static_ui();
         this.update_dynamic_ui();
@@ -279,7 +283,9 @@ class question_asker {
 
     initForQuiz(){
         $('.sheet').html('').css('visibility', 'hidden');
-        
+        $('.sheet').css('display', 'grid');
+        $('.g').css('visibility', 'visible')
+        $('.submit').css('visibility', 'visible');
         this.correctness = '"cannot calculate"';
         this.quiz_r.clear();
         this.quizResult = [];
@@ -336,7 +342,7 @@ function go_next(q){
     up(q.i+1, q)
 }
 
-function renderChart(threeDArray){
+function renderChart(threeDArray, q){
     $('.sheet').css('visibility', 'visible')
     for (var i of threeDArray){
         for (var j of i){
@@ -345,6 +351,9 @@ function renderChart(threeDArray){
     }
     $('.correctness')
         .html(`final score: ${GENQ.filterSubArray(threeDArray, 2, '✔').length*10} out of 100`);
+    $('.submit').css('visibility', 'hidden')
+    $('.g').css('visibility', 'hidden')
+    q.mode = 'static'
     
 }
 
@@ -365,7 +374,7 @@ function checkAllAnswer(q){
         return '';
     }
     console.log(q.quizResult);
-    renderChart(q.quizResult);
+    renderChart(q.quizResult, q);
     return q.quizResult;
 }
 
@@ -468,6 +477,3 @@ main().then((q)=>{
     $('.sheet').css('visibility', 'hidden')
 
 });
-
-
-
