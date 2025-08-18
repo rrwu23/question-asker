@@ -435,8 +435,8 @@ main().then((q)=>{
     up(q.startingpoint, q)
 
     $('.submit').click(()=>{
-        var result = GENQ.trans($('#null').val())
-        if (result != ''){
+        var result = $('#null').val()
+        if (GENQ.trans(result) != ''){
             q.checkanwser(result)
         }
     });
@@ -468,4 +468,5 @@ main().then((q)=>{
     $('.sheet').css('visibility', 'hidden')
 
 });
+
 
