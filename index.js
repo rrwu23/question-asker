@@ -10,7 +10,7 @@ class GENQ {
 
     static async load(){
         if (!GENQ.questionDB){
-            const file = 'questions_cleaned.json';
+            const file = 'questionBetter.json';
             try{
                 var res = await fetch('./public/' + file);
                 if (!res.ok){
@@ -468,5 +468,6 @@ main().then((q)=>{
     $('.sheet').css('visibility', 'hidden')
 
 });
+
 
 
