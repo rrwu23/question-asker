@@ -10,14 +10,16 @@ class GENQ {
 
     static async load(){
         if (!GENQ.questionDB){
+            const file = 'questions_cleaned.json';
             try{
-                var res = await fetch('./public/questions.json');
+                var res = await fetch('./public/' + file);
                 if (!res.ok){
-                    throw new Error('ahhhhhh'+res.status)
+                    throw new Error('ahhhhhh'+ res.status)
                 }
                 GENQ.questionDB = await res.json();
+                console.log('success')
             } catch{
-                console.log('failed to load questions.json');
+                console.log('failed to load ' + file);
 
                 GENQ.questionDB = {'time': {}}
             }
@@ -107,17 +109,36 @@ class GENQ {
         return result[op]
     }
 
+    static inInterval(n, arr){
+        if (n <= arr[1] && n >= arr[0]){
+            return n;
+        }
+
+        else{
+            if (n > arr[1]){
+                return arr[1]
+            } else{
+            return arr[0];
+            }
+        }
+    }
+
 }
 
 class question_asker {
 
     constructor (){
+        this.mode = 'practice';
         this.question = GENQ.questionDB.time;
         this.r=[];
+        this.quiz_r = new Map();
         this.i = 0
-        this.q = Object.entries(this.question) 
+        this.q = Object.entries(this.question);
+        this.selq = this.q;
         this.correctness = '"cannot calculate" ';
         this.attempt = new Map();
+        this.startingpoint = 0;
+        this.quizResult = []
     }
     //the class constructor
 
@@ -137,25 +158,36 @@ class question_asker {
         console.log(this.attempt);
     }
 
+    pre(){
+        //set attempt first
+        this.setA();
+        //clean this.r
+        this.removeExtra()
+    }
+
     checkanwser(a){
-        if (a == GENQ.trans(this.q[this.i][1])){
+        if (this.mode == 'practice'){
+        if (GENQ.trans(a) == GENQ.trans(this.q[this.i][1])){
+            
                 this.r.push([this.i, 1, $('#null').val()])
                 var audio = new Audio('./assets/good.mp3');
-                
                 audio.play();
-                
             } else{
                 this.r.push([this.i, 0, $('#null').val()])  
                 var audio = new Audio('./assets/bad.mp3');
 
                 audio.play();
             }
-        this.setA();
-        this.removeExtra()
-        up(this.i+1);
-        
-        console.log('attempt set success!')
-        
+
+        this.pre(); //prepare for up()
+
+         //moves upward by one
+        }
+
+        else if (this.mode == 'quiz'){
+            this.quiz_r.set(this.i, a)
+        }
+        up(this.i+1, this);
     }
 
 
@@ -167,156 +199,273 @@ class question_asker {
         
     }
 
+    update_static_ui(){
+        
+        //inits question 
+        $('.questiona').html('');
+        $('#ok').html(`question : ${this.i+1 - this.startingpoint}/${this.selq.length}`)
+        //updates the radar bar UI
+        console.log('current question: ' + this.selq[this.i - this.startingpoint],"i: " + this.i, this.i - this.startingpoint);
+        $('.questiona').html(this.selq[this.i - this.startingpoint][0])
+        //debugs:
+        // console.log(this.q.length)
+        // console.log(GENQ.find(this.r, this.i, 0));
+        
+        $('#null').css('color', 'white').css('background', 'black');
+        this.cal();
+        $('.correctness').html('correctness: ' + this.correctness + '%');
+        $('.qd').html('questions done: ' + this.r.length);
+        //debug
+        //console.log('loading attempt: '+this.attempt.get(this.i));
+
+        $('.trys').html('attempt: ' + (this.attempt.get(this.i)||0));
+
+        if (this.mode == 'quiz'){
+            $('.g').css('visibility', 'visible');
+            $('.restart').css('display', 'none');
+            $('.nav').css('display', 'none');
+            $('.wc').css('display', 'none')
+            $('.qd').css('display', 'none');
+            $('.trys').css('display', 'none');
+        } else if (this.mode == 'practice'){
+            $('.g').css('visibility', 'hidden');
+            $('.restart').css('display', 'block');
+            $('.nav').css('display', 'block');
+            $('.wc').css('display', 'block');
+            $('.qd').css('display', 'block');
+            $('.trys').css('display', 'block');
+        }
+
+    } 
+    
+
+    update_dynamic_ui(){
+        console.log('outer' + this.mode , this.mode == 'practice')
+        //processes anwser and dynamic UI
+        //not placed in check anwser because the purpose of status is to see what you got first try and tell if you are correct or not//
+        if (this.mode == 'practice'){
+        $('#null').val(GENQ.find(this.r, this.i, 0)[2]);
+        if (JSON.stringify(GENQ.filterSubArray(this.r, 0, this.i)) != JSON.stringify([])){ //make sure that anwser is not empty
+            if (GENQ.filterSubArray(this.r, 0, this.i)[0][1] === 1){ // anwser correct
+
+                $('.wc').addClass('green')
+            } else{ //anwser incorrect
+
+                $('.wc').addClass('red');
+            }
+
+        } else{
+
+            $('.wc').addClass('white')
+        }
+
+        } else if (this.mode == 'quiz'){
+            $('#null').val(this.quiz_r.get(this.i));
+            console.log(this.mode)
+        }
+    }
+
     update(){
-        //if statements and complex UI
         //init for the status circle
         $('.wc').removeClass('red');
         $('.wc').removeClass('green');
         $('.wc').removeClass('white');
 
-        //updates the radar bar UI
-        $('.questiona').html(this.q[this.i][0])
-        //debugs:
-        // console.log(this.q.length)
-        // console.log(GENQ.find(this.r, this.i, 0));
-        $('#null').val(GENQ.find(this.r, this.i, 0)[2]);
-        $('#null').css('color', 'white').css('background', 'black');
-        this.cal();
-        $('.correctness').html('correctness: ' + q.correctness + '%');
-        $('.qd').html('questions done: ' + this.r.length);
-        //debug
-        console.log('loading attempt: '+this.attempt.get(this.i));
+        //updates the ui after q is updated
+        this.update_static_ui();
+        this.update_dynamic_ui();
 
-        $('.trys').html('attempt: ' + (this.attempt.get(this.i)||0));
+    }
 
-        //processes anwser and dynamic UI
-        if (JSON.stringify(GENQ.filterSubArray(this.r, 0, this.i)) != JSON.stringify([])){ //make sure that anwser is not empty
-            if (GENQ.filterSubArray(this.r, 0, this.i)[0][1] === 1){ // anwser correct
-                $('.gb').html('status: correct');
-                $('.wc').addClass('green')
-            } else{ //anwser incorrect
-                $('.gb').html('correct anwser: ' + this.q[this.i][1])
-                $('.wc').addClass('red');
-            }
-
-            
-        } else{
-            $('.gb').html('status: none');
-            $('.wc').addClass('white')
-        }
+    initForQuiz(){
+        $('.sheet').html('').css('visibility', 'hidden');
         
+        this.correctness = '"cannot calculate"';
+        this.quiz_r.clear();
+        this.quizResult = [];
+
     }
 
 }
-var q;
-async function main(){
-    await GENQ.load();
-    q = new question_asker();
-
-}
-
-function show(){
-    let txt = $('#null').val();
-    let result = GENQ.trans(txt)
-    console.log(result)
-    return result;
-}
-
-main().then(()=>{
-    //make sure that data is loaded before use 
-    up(0)
-});
-
-
-$('.submit').click(()=>{
-    const result = show();
-    if (result != ''){
-        q.checkanwser(result)
-    }
-});
 
 //--------------------------------------//
-function up(n){
+function up(n, q){
+    // if n is a float: 8.9, 1.4 or NaN up will return nothing and stop
     if (Number.isNaN(n) || !Number.isInteger(n)){
         return;
     }
-    $('.questiona').html('');
-    if (n > (q.q.length-1)){
-        n = q.q.length-1
-    } else if (n < 0){
-        n = 0
-    }
 
+    //make sure that cannot exceed limit
+    
+    n = GENQ.inInterval(n, [q.startingpoint, q.startingpoint + q.selq.length-1])
 
     q.i = n;
-    if (n===0){
+
+    //hides back and next button if on mininum index or maximum index
+    if (n===q.startingpoint){
         $('.back').css('visibility', 'hidden')
     } else{
         $('.back').css('visibility', 'visible')
     }
-    console.log([n, q.q.length])
-    if (n === (q.q.length-1)){
+    //debug
+    console.log([n, q.selq.length-1])
+    if (n === (q.startingpoint + q.selq.length-1)){
         $('.next').css('visibility', 'hidden')
     } else{
         $('.next').css('visibility', 'visible')
     }
 
-    $('#ok').html(`question : ${q.i+1}/${q.q.length}`)
+    
+/*    update<-______
+        |           |
+        \/          |
+        render _____|
+
+*/
+    //updates
     q.update();
-}
-//---------------------------------------//
 
 
-//asings each day button with a eventlistner
-$('#d1').click(()=>{
-    up(0)
-
-})
-
-$('#d2').click(()=>{
-    up(20);
-
-})
-
-$('#d3').click(()=>{
-    up(40);
-
-})
-
-$('#d4').click(()=>{
-    up(60)
-
-})
-
-$('#d5').click(()=>{
-    up(80)
-
-})
-
-$('.go').click(()=>{
-    up(Number($('.interval').val())-1)
-    $('.interval').val('')
-})
-
-function go_back(){
-    up(q.i-1)
 }
 
-function go_next(){
-    up(q.i+1)
+function go_back(q){
+    up(q.i-1, q)
 }
 
+function go_next(q){
+    up(q.i+1, q)
+}
 
+function renderChart(threeDArray){
+    $('.sheet').css('visibility', 'visible')
+    for (var i of threeDArray){
+        for (var j of i){
+            $('.sheet').append(`<div class="cell">${j}</div>`)
+        }
+    }
+    $('.correctness')
+        .html(`final score: ${GENQ.filterSubArray(threeDArray, 2, '✔').length*10} out of 100`);
+    
+}
 
-function reset(){
+function checkAllAnswer(q){
+    if (q.mode == 'quiz'){
+        if (q.quiz_r.size === 10){
+            for (var i = 0; i<10; i++){
+                if (GENQ.trans(String([...q.quiz_r][i][1])) == GENQ.trans(String(q.selq[i][1]))){
+                    q.quizResult.push([i+1, [...q.quiz_r][i][1], '✔'])
+                } else{
+                    q.quizResult.push([i+1, [...q.quiz_r][i][1], `correct anwser: ${String(q.selq[i][1])}`])
+                }
+            }
+        } else{
+            return '';
+        }
+    } else{
+        return '';
+    }
+    console.log(q.quizResult);
+    renderChart(q.quizResult);
+    return q.quizResult;
+}
+
+function reset(q){
     if (confirm('reset ?')){
+        
+        q.initForQuiz();
         q.r = [];
-        q.correctness = 100;
+        q.i = 0;
 
-        up(0)
+        up(0, q)
 
     } else{
         return
     }
 }
+
+
+async function main(){
+    await GENQ.load();
+    const q = new question_asker();
+    
+    return q;
+}
+
+function dropdownManageMent(q){
+    q.mode = 'practice'
+    $('.options p').click(function (){
+        q.mode = $(this).html().replace(' mode', '');
+        $('.selContent').html( $(this).html());
+        console.log(q.mode)
+        if (GENQ.trans(q.mode) == 'quiz'){
+            q.startingpoint = prompt('type what starting question you want to start with (1 to 90 for q1 to q90)')
+            q.startingpoint = Math.round(GENQ.inInterval(q.startingpoint, [1, 90]))-1;
+            q.i = q.startingpoint;
+            console.log(q.startingpoint);
+            q.selq = q.q.slice(q.startingpoint, q.startingpoint+10);
+            console.log(q.selq);
+            q.initForQuiz();
+            
+            
+        } else {
+            q.selq = q.q
+           
+        }
+
+        up(q.i, q)
+    })
+
+    $('.selMode').hover(function () {
+        $('.options').css('display', 'block')
+    }, function (){
+        $('.options').css('display', 'none')
+    })
+
+    
+}
+//---------------------------------------//
+
+
+
+//make sure that data is loaded before use 
+main().then((q)=>{
+
+    //debug
+    //
+    up(q.startingpoint, q)
+
+    $('.submit').click(()=>{
+        var result = GENQ.trans($('#null').val())
+        if (result != ''){
+            q.checkanwser(result)
+        }
+    });
+
+
+    $('.go').click(()=>{
+        up(Number($('.interval').val())-1, q)
+        $('.interval').val('')
+    });
+
+    $('.back').click(()=>{
+        go_back(q);
+    });
+
+    $('.next').click(()=>{
+        go_next(q);
+    });
+
+    $('.restart').click(()=>{
+        reset(q)
+    })
+
+    $('.g').click(()=>{
+        console.log(q.quiz_r)
+        checkAllAnswer(q);
+    })
+
+    dropdownManageMent(q);
+    $('.sheet').css('visibility', 'hidden')
+
+});
 
