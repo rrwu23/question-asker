@@ -1,0 +1,13 @@
+{
+    "time": 
+        {
+            "format": "xx:xx AM/PM/x hours x minutes",
+            "quizTime": "900"
+        },
+         
+    "arithmetic": 
+        {
+            "format": "enter a integer",
+            "quizTime": "900"
+        }
+}
