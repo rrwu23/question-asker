@@ -27,12 +27,17 @@
 <body>
     
 <div class="container">
-    
+    <div class="module span2">
+        <div class="time m">time</div> 
+        <div class = "arithmetic m">arithmetic</div>
+    </div>
+    <div class="selMode"><div class="practice sel"> practice mode</div><div class="sel quiz">Quiz mode</div></div>
     <div class="main">
          
-        <div class="selMode"><div class="selContent">default(practice)</div><div class="options"><p>quiz mode</p>
-            <p>practice mode</p>
-        </div></div>
+        
+
+        <div class="modes"><div class="practice mode"></div></div>
+
         <em class="bold nav ">GO TO QUESTION</em><div class="nav"><input type="text" class="interval" name="inter"><input type="submit" value="GO!" class="go"></div>
         <h2 class="questiona"></h2>
         <div class="wc"></div>
@@ -49,16 +54,20 @@
 
     </div>
 
-    <div class = sub>
+    <div class = "sub span2">
      </h1><br><p id="ok">question: </p><br>
     <p class="correctness">correctness: 100%</p>
     <p class="qd">questions done: 0</p>
     <p class="trys">attempt: 0</p>
     <div class="sheet"></div>
+    <p class="timedisplay">Remaining time: 15:00</p>
+
+    </div>
+
+    
 
 </div>
-
-</div>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="index.js"></script>
 </body>
