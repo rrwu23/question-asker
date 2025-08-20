@@ -7,21 +7,25 @@ class GENQ {
 
     static opers = ['*', '/', '+', '-'];
     static questionDB = null; 
+    static Qformats = null;
 
     static async load(){
         if (!GENQ.questionDB){
-            const file = 'questionBetter.json';
+            const files = ['questionBetter.json', 'Msettings.json'];
+            const storageArea = ['questionDB', 'Qformats'];
+            for (var i in files){
             try{
-                var res = await fetch('./public/' + file);
+                var res = await fetch('./public/' + files[i]);
                 if (!res.ok){
                     throw new Error('ahhhhhh'+ res.status)
                 }
-                GENQ.questionDB = await res.json();
+                GENQ[storageArea[i]] = await res.json();
                 console.log('success')
             } catch{
-                console.log('failed to load ' + file);
+                console.log('failed to load ' + i);
 
-                GENQ.questionDB = {'time': {}}
+                GENQ[files[i]] = {}
+            }
             }
         }   
     }
@@ -130,8 +134,9 @@ class question_asker {
     constructor (){
         this.qLoc = 'time';
         this.mode = 'practice';
-        this.quizTime = 300 //in seconds
+        this.quizTime = null; //in seconds
         this.r=[];
+        this.format = 
         this.quiz_r = new Map();
         this.i = 0;
         this.q = Object.entries(GENQ.questionDB.time);
@@ -210,6 +215,7 @@ class question_asker {
     update_static_ui(){
         
         //inits question 
+
         $('.questiona').html('');
         $('#ok').html(`question : ${this.i + 1}/${this.selq.length}`);
         console.log(this.i)
@@ -221,6 +227,7 @@ class question_asker {
         // console.log(GENQ.find(this.r, this.i, 0));
         
         $('#null').css('color', 'white').css('background', 'black');
+        $('#null').attr('placeholder', this.format)
         this.cal();
         $('.correctness').html('correctness: ' + this.correctness + '%');
         $('.qd').html('questions done: ' + this.r.length);
@@ -341,6 +348,8 @@ class question_asker {
         
         this.q = Object.entries(GENQ.questionDB[module]);
         this.qLoc = module
+        this.format = GENQ.Qformats[module].format
+        this.quizTime = Number(GENQ.Qformats[module].quizTime)
         changeMode(this.mode, q)
         this.r = (this.data[this.qLoc] || []);
         this.initForPractice();
@@ -485,6 +494,7 @@ function clearTimer(){
 
 async function main(){
     await GENQ.load();
+    console.log(GENQ.Qformats, GENQ.questionDB)
     const q = new question_asker();
     window.q = q
     return q;
@@ -504,6 +514,7 @@ function changeMode(mode, q){
 main().then((q)=>{
     q.initForPractice();
     changeMode('practice', q)
+    q.changeModule('time')
     //debug
     //
     up(0, q)
