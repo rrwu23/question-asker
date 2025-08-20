@@ -1,4 +1,4 @@
-
+let timer;
 class GENQ {
 
     static trans(s){
@@ -25,32 +25,32 @@ class GENQ {
             }
         }   
     }
-    //--------------------methods/ functions in sleep:------------------------//
-    // static slice(idx, str)
-    // {
+    //--------------------methods/ functions in sleep:----------------------//
+    static slice(idx, str)
+    {
 
-    // }
+    }
 
     
 
-    // static gen_q1(){
-    //     var a = 1+Math.floor(Math.random()*1000);
-    //     var b = 1+Math.floor(Math.random()*1000);
-    //     var c = 1+Math.floor(Math.random()*1000);
-    //     var d = 1+Math.floor(Math.random()*1000);
-    //     var o = _.sampleSize(opers, 3);
-    //     return `${a} ${o[0]} ${b} ${o[1]} ${c} ${o[2]} ${d}`;
+    static gen_q1(){
+        var a = 1+Math.floor(Math.random()*1000);
+        var b = 1+Math.floor(Math.random()*1000);
+        var c = 1+Math.floor(Math.random()*1000);
+        var d = 1+Math.floor(Math.random()*1000);
+        var o = _.sampleSize(GENQ.opers, 3);
+        return `${a} ${o[0]} ${b} ${o[1]} ${c} ${o[2]} ${d}`;
         
-    // }
+    }
 
-    // static gen_q2(){
+    static gen_q2(){
 
-    // }
+    }
 
-    // static filter(){
+    static filter(){
         
-    // }
-    //--------------------------------------------------------------------------//
+    }
+    //----------------------------------------------------------------------//
 
     static ReplaceRepeatedItemsFromSubArr(arr, idx, replaceIdx) {
         let map = new Map();
@@ -128,19 +128,24 @@ class GENQ {
 class question_asker {
 
     constructor (){
+        this.qLoc = 'time';
         this.mode = 'practice';
-        this.question = GENQ.questionDB.time;
+        this.quizTime = 300 //in seconds
         this.r=[];
         this.quiz_r = new Map();
-        this.i = 0
-        this.q = Object.entries(this.question);
+        this.i = 0;
+        this.q = Object.entries(GENQ.questionDB.time);
         this.selq = this.q;
         this.correctness = '"cannot calculate" ';
         this.attempt = new Map();
-        this.startingpoint = 0;
         this.quizResult = []
+        this.data = {'time': []}
     }
     //the class constructor
+
+    saveData(){
+        this.data[this.qLoc] = this.r
+    }
 
     cal(){
         if(this.r.length != 0){
@@ -170,12 +175,14 @@ class question_asker {
         if (GENQ.trans(a) == GENQ.trans(this.q[this.i][1])){
             
                 this.r.push([this.i, 1, $('#null').val()])
+                this.saveData()
                 var audio = new Audio('./assets/good.mp3');
                 audio.play();
             } else{
-                this.r.push([this.i, 0, $('#null').val()])  
+                this.r.push([this.i, 0, $('#null').val()]) 
+                this.saveData();
+                
                 var audio = new Audio('./assets/bad.mp3');
-
                 audio.play();
             }
 
@@ -196,6 +203,7 @@ class question_asker {
         const data = GENQ.ReplaceRepeatedItemsFromSubArr(this.r, 0, 2);
         console.log('data: '+JSON.stringify(data))
         this.r = GENQ.RemoveRepeateditemsFromSubArr(data, 0)
+        this.saveData()
         
     }
 
@@ -203,10 +211,11 @@ class question_asker {
         
         //inits question 
         $('.questiona').html('');
-        $('#ok').html(`question : ${this.i+1 - this.startingpoint}/${this.selq.length}`)
+        $('#ok').html(`question : ${this.i + 1}/${this.selq.length}`);
+        console.log(this.i)
         //updates the radar bar UI
-        console.log('current question: ' + this.selq[this.i - this.startingpoint],"i: " + this.i, this.i - this.startingpoint);
-        $('.questiona').html(this.selq[this.i - this.startingpoint][0])
+        console.log('current question: ' + this.selq[this.i],"i: " + this.i);
+        $('.questiona').html(this.selq[this.i][0])
         //debugs:
         // console.log(this.q.length)
         // console.log(GENQ.find(this.r, this.i, 0));
@@ -235,9 +244,7 @@ class question_asker {
             $('.wc').css('display', 'block');
             $('.qd').css('display', 'block');
             $('.trys').css('display', 'block');
-            $('.sheet').css('display', 'none');
-            $('sheet').html('');
-            $('.submit').css('visibility', 'visible')
+
         }
 
     } 
@@ -281,21 +288,71 @@ class question_asker {
 
     }
 
+    
     initForQuiz(){
+        var seconds = this.quizTime;
+        updateTime(seconds, this);
+        if (!timer){
+            timer = setInterval(()=>{
+                seconds --
+                console.log(seconds)
+                updateTime(seconds, this)
+                if (seconds == 0){
+                    clearTimer()
+                    console.log('time up')
+                    console.log(this)
+                    checkAllAnswer(this);
+                } 
+
+            }, 1000)
+        }
+
+        //make sure to init UIs
         $('.sheet').html('').css('visibility', 'hidden');
         $('.sheet').css('display', 'grid');
         $('.g').css('visibility', 'visible')
         $('.submit').css('visibility', 'visible');
+        $('.timedisplay').css('visibility', 'visible');
+        //init all variables
+        this.i = 0;
         this.correctness = '"cannot calculate"';
         this.quiz_r.clear();
         this.quizResult = [];
+        this.selq = _.sampleSize(this.q, 10)
+    }
 
+    initForPractice(){
+        
+        //update ui
+        $('.sheet').css('display', 'none');
+        $('sheet').html('');
+        $('.submit').css('visibility', 'visible')
+        $('.timedisplay').css('visibility', 'hidden');
+        //init all variables
+        this.i = 0;
+        this.correctness = '"cannot calculate"';
+        this.selq = this.q;
+        clearTimer();
+
+    }
+
+    changeModule(module){
+        console.log('called')
+        
+        this.q = Object.entries(GENQ.questionDB[module]);
+        this.qLoc = module
+        changeMode(this.mode, q)
+        this.r = (this.data[this.qLoc] || []);
+        this.initForPractice();
+        up(0, this)
+        console.log(this.q)
     }
 
 }
 
 //--------------------------------------//
 function up(n, q){
+    
     // if n is a float: 8.9, 1.4 or NaN up will return nothing and stop
     if (Number.isNaN(n) || !Number.isInteger(n)){
         return;
@@ -303,19 +360,19 @@ function up(n, q){
 
     //make sure that cannot exceed limit
     
-    n = GENQ.inInterval(n, [q.startingpoint, q.startingpoint + q.selq.length-1])
+    n = GENQ.inInterval(n, [0, q.selq.length-1])
 
     q.i = n;
 
     //hides back and next button if on mininum index or maximum index
-    if (n===q.startingpoint){
+    if (n===0){
         $('.back').css('visibility', 'hidden')
     } else{
         $('.back').css('visibility', 'visible')
     }
     //debug
     console.log([n, q.selq.length-1])
-    if (n === (q.startingpoint + q.selq.length-1)){
+    if (n === (0 + q.selq.length-1)){
         $('.next').css('visibility', 'hidden')
     } else{
         $('.next').css('visibility', 'visible')
@@ -324,7 +381,7 @@ function up(n, q){
     
 /*    update<-______
         |           |
-        \/          |
+        \/          \
         render _____|
 
 */
@@ -353,24 +410,52 @@ function renderChart(threeDArray, q){
         .html(`final score: ${GENQ.filterSubArray(threeDArray, 2, '✔').length*10} out of 100`);
     $('.submit').css('visibility', 'hidden')
     $('.g').css('visibility', 'hidden')
+    $('.timedisplay').css('visibility', 'hidden');
+
     q.mode = 'static'
     
 }
 
+function updateTime(seconds, q){
+    if (q.mode = 'quiz'){
+        let mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+        let secs = String(seconds % 60).padStart(2, '0');
+        $('.timedisplay').html(`Remaining time: ${mins}:${secs}`) 
+    }
+}
+
 function checkAllAnswer(q){
     if (q.mode == 'quiz'){
-        if (q.quiz_r.size === 10){
-            for (var i = 0; i<10; i++){
+        if (timer){
+            clearTimer()
+        }
+        console.log('run')
+        if (q.quiz_r.size === q.selq.length){
+            
+            console.log([...q.quiz_r])
+            for (var i = 0; i<q.selq.length; i++){
+                console.log(i)
+                console.log([...q.quiz_r]);
                 if (GENQ.trans(String([...q.quiz_r][i][1])) == GENQ.trans(String(q.selq[i][1]))){
+                    console.log('hi: ' + [...q.quiz_r][i])
                     q.quizResult.push([i+1, [...q.quiz_r][i][1], '✔'])
                 } else{
+                    console.log('hi: ' + [...q.quiz_r][i])
                     q.quizResult.push([i+1, [...q.quiz_r][i][1], `correct anwser: ${String(q.selq[i][1])}`])
                 }
             }
         } else{
-            return '';
+            console.log('adding blank elements because undone')
+            for (var i = q.quiz_r.size; i < q.selq.length; i++){
+                console.log('setting...')
+                q.quiz_r.set(i, 'blank');
+                
+            }
+
+            return checkAllAnswer(q)
         }
     } else{
+        console.log('check_all_anwser can only be used in quiz mode', q.mode)
         return '';
     }
     console.log(q.quizResult);
@@ -380,8 +465,7 @@ function checkAllAnswer(q){
 
 function reset(q){
     if (confirm('reset ?')){
-        
-        q.initForQuiz();
+        q.initForPractice();
         q.r = [];
         q.i = 0;
 
@@ -393,55 +477,37 @@ function reset(q){
 }
 
 
+
+function clearTimer(){
+    clearInterval(timer);
+    timer = null;
+}
+
 async function main(){
     await GENQ.load();
     const q = new question_asker();
-    
+    window.q = q
     return q;
 }
 
-function dropdownManageMent(q){
-    q.mode = 'practice'
-    $('.options p').click(function (){
-        q.mode = $(this).html().replace(' mode', '');
-        $('.selContent').html( $(this).html());
-        console.log(q.mode)
-        if (GENQ.trans(q.mode) == 'quiz'){
-            q.startingpoint = prompt('type what starting question you want to start with (1 to 90 for q1 to q90)')
-            q.startingpoint = Math.round(GENQ.inInterval(q.startingpoint, [1, 90]))-1;
-            q.i = q.startingpoint;
-            console.log(q.startingpoint);
-            q.selq = q.q.slice(q.startingpoint, q.startingpoint+10);
-            console.log(q.selq);
-            q.initForQuiz();
-            
-            
-        } else {
-            q.selq = q.q
-           
-        }
-
-        up(q.i, q)
-    })
-
-    $('.selMode').hover(function () {
-        $('.options').css('display', 'block')
-    }, function (){
-        $('.options').css('display', 'none')
-    })
-
-    
+function changeMode(mode, q){
+    q.mode = mode;
+    up(q.i, q)
 }
+
+
 //---------------------------------------//
 
 
 
 //make sure that data is loaded before use 
 main().then((q)=>{
-
+    q.initForPractice();
+    changeMode('practice', q)
     //debug
     //
-    up(q.startingpoint, q)
+    up(0, q)
+    clearTimer()
 
     $('.submit').click(()=>{
         var result = $('#null').val()
@@ -473,7 +539,24 @@ main().then((q)=>{
         checkAllAnswer(q);
     })
 
-    dropdownManageMent(q);
+    $('.practice').click(()=>{
+        //Make sure UIs and Properties are initialized before use
+        q.initForPractice();
+        changeMode('practice', q)
+    });
+
+    $('.quiz').click(()=>{
+        //make sure UIs and Properties are initialized before use
+        q.initForQuiz();
+        changeMode('quiz', q)
+        
+    });
     $('.sheet').css('visibility', 'hidden')
+
+    $('.module').children().each(function (){
+        $(this).click(function(){
+            q.changeModule($(this).text());
+        })
+    })
 
 });
