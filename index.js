@@ -355,7 +355,7 @@ class question_asker {
         this.qLoc = module
         this.format = GENQ.Qformats[module].format
         this.quizTime = Number(GENQ.Qformats[module].quizTime)
-        changeMode(this.mode, q)
+        changeMode('practice', q)
         this.r = (this.data[this.qLoc] || []);
         this.initForPractice();
         up(0, this)
