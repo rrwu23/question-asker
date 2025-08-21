@@ -236,7 +236,7 @@ class question_asker {
 
         $('.trys').html('attempt: ' + (this.attempt.get(this.i)||0));
 
-        if (this.mode == 'quiz'){
+        if (this.mode == 'quiz' || this.mode == 'after-quiz'){
             $('.g').css('visibility', 'visible');
             $('.restart').css('display', 'none');
             $('.nav').css('display', 'none');
@@ -251,6 +251,11 @@ class question_asker {
             $('.wc').css('display', 'block');
             $('.qd').css('display', 'block');
             $('.trys').css('display', 'block');
+
+        } 
+
+        if (this.mode == 'after-quiz'){
+            $('.g').css('visibility', 'hidden');
 
         }
 
@@ -277,7 +282,7 @@ class question_asker {
             $('.wc').addClass('white')
         }
 
-        } else if (this.mode == 'quiz'){
+        } else if (this.mode == 'quiz' || this.mode == 'after-quiz'){
             $('#null').val(this.quiz_r.get(this.i));
             console.log(this.mode)
         }
@@ -420,13 +425,12 @@ function renderChart(threeDArray, q){
     $('.submit').css('visibility', 'hidden')
     $('.g').css('visibility', 'hidden')
     $('.timedisplay').css('visibility', 'hidden');
-
-    q.mode = 'static'
+    changeMode('after-quiz', q)
     
 }
 
 function updateTime(seconds, q){
-    if (q.mode = 'quiz'){
+    if (q.mode == 'quiz'){
         let mins = String(Math.floor(seconds / 60)).padStart(2, '0');
         let secs = String(seconds % 60).padStart(2, '0');
         $('.timedisplay').html(`Remaining time: ${mins}:${secs}`) 
