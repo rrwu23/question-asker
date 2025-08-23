@@ -150,7 +150,7 @@ class question_asker {
 
     saveData(){
         this.data[this.qLoc] = this.r
-    }
+    } 
 
     cal(){
         if(this.r.length != 0){
@@ -226,10 +226,10 @@ class question_asker {
         // console.log(this.q.length)
         // console.log(GENQ.find(this.r, this.i, 0));
         
-        $('#null').css('color', 'white').css('background', 'black');
+        $('#null').css('color', 'black')
         $('#null').attr('placeholder', this.format)
         this.cal();
-        $('.correctness').html('correctness: ' + this.correctness + '%');
+        
         $('.qd').html('questions done: ' + this.r.length);
         //debug
         //console.log('loading attempt: '+this.attempt.get(this.i));
@@ -237,16 +237,21 @@ class question_asker {
         $('.trys').html('attempt: ' + (this.attempt.get(this.i)||0));
 
         if (this.mode == 'quiz' || this.mode == 'after-quiz'){
-            $('.g').css('visibility', 'visible');
-            $('.restart').css('display', 'none');
+            
+            $('.g').css('display', 'block');
+            $('.restart').css('visibility', 'hidden');
             $('.nav').css('display', 'none');
             $('.wc').css('display', 'none')
             $('.qd').css('display', 'none');
             $('.trys').css('display', 'none');
+            $('.correctness').css('display', 'none');
             
         } else if (this.mode == 'practice'){
-            $('.g').css('visibility', 'hidden');
-            $('.restart').css('display', 'block');
+            $('.correctness').css('visibility', 'visible');
+            $('.correctness').css('display', 'block');
+            $('.correctness').html('correctness: ' + this.correctness + '%');
+            $('.g').css('display', 'none');
+            $('.restart').css('visibility', 'visible');
             $('.nav').css('display', 'block');
             $('.wc').css('display', 'block');
             $('.qd').css('display', 'block');
@@ -256,6 +261,8 @@ class question_asker {
 
         if (this.mode == 'after-quiz'){
             $('.g').css('visibility', 'hidden');
+            $('.correctness').css('visibility', 'visible');
+            $('.correctness').css('display', 'block');
 
         }
 
@@ -303,25 +310,28 @@ class question_asker {
     
     initForQuiz(){
         var seconds = this.quizTime;
-        updateTime(seconds, this);
-        if (!timer){
-            timer = setInterval(()=>{
-                seconds --
-                console.log(seconds)
-                updateTime(seconds, this)
-                if (seconds == 0){
-                    clearTimer()
-                    console.log('time up')
-                    console.log(this)
-                    checkAllAnswer(this);
-                } 
+        console.log(seconds)
+        updateTime(this.quizTime, this);
+        
+        if (timer) clearTimer();
 
-            }, 1000)
-        }
+        timer = setInterval(()=>{
+            seconds --
+            console.log(seconds)
+            updateTime(seconds, this)
+            if (seconds == 0){
+                clearTimer()
+                console.log('time up')
+                console.log(this)
+                checkAllAnswer(this);
+            } 
+
+        }, 1000)
+        
 
         //make sure to init UIs
-        $('.sheet').html('').css('visibility', 'hidden');
-        $('.sheet').css('display', 'grid');
+        $('.sheet').html('').css('display', 'block');
+        
         $('.g').css('visibility', 'visible')
         $('.submit').css('visibility', 'visible');
         $('.timedisplay').css('visibility', 'visible');
@@ -331,6 +341,9 @@ class question_asker {
         this.quiz_r.clear();
         this.quizResult = [];
         this.selq = _.sampleSize(this.q, 10)
+        $('.quiz').addClass('selE')
+        $('.practice').removeClass('selE')
+
     }
 
     initForPractice(){
@@ -346,6 +359,10 @@ class question_asker {
         this.selq = this.q;
         clearTimer();
 
+        $('.practice').addClass('selE')
+        $('.quiz').removeClass('selE')
+
+        
     }
 
     changeModule(module){
@@ -414,7 +431,8 @@ function go_next(q){
 }
 
 function renderChart(threeDArray, q){
-    $('.sheet').css('visibility', 'visible')
+    $('.sheet').css('visibility', 'visible');
+    $('.sheet').css('display', 'grid');
     for (var i of threeDArray){
         for (var j of i){
             $('.sheet').append(`<div class="cell">${j}</div>`)
@@ -430,11 +448,11 @@ function renderChart(threeDArray, q){
 }
 
 function updateTime(seconds, q){
-    if (q.mode == 'quiz'){
-        let mins = String(Math.floor(seconds / 60)).padStart(2, '0');
-        let secs = String(seconds % 60).padStart(2, '0');
-        $('.timedisplay').html(`Remaining time: ${mins}:${secs}`) 
-    }
+
+    let mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+    let secs = String(seconds % 60).padStart(2, '0');
+    $('.timedisplay').html(`remaining time: ${mins}:${secs}`) 
+
 }
 
 function checkAllAnswer(q){
@@ -480,6 +498,7 @@ function reset(q){
     if (confirm('reset ?')){
         q.initForPractice();
         q.r = [];
+        q.saveData();
         q.i = 0;
 
         up(0, q)
@@ -513,10 +532,10 @@ function changeMode(mode, q){
 //---------------------------------------//
 
 
-
 //make sure that data is loaded before use 
 main().then((q)=>{
     q.initForPractice();
+    $('.practice').addClass('selE')
     changeMode('practice', q)
     q.changeModule('time')
     //debug
@@ -558,6 +577,9 @@ main().then((q)=>{
         //Make sure UIs and Properties are initialized before use
         q.initForPractice();
         changeMode('practice', q)
+
+
+        
     });
 
     $('.quiz').click(()=>{
@@ -575,3 +597,5 @@ main().then((q)=>{
     })
 
 });
+
+
