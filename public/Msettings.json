@@ -1,14 +1,23 @@
 {
     "time": 
         {
-            "format": "xx:xx AM/PM/x hours x minutes",
-            "quizTime": "900"
+            "format": "anwser format: hh:mm AM/PM (x hours y minutes)",
+            "quizTime": "900",
+            "type": "direct"
         },
          
     "arithmetic": 
         {
             "format": "enter an integer",
-            "quizTime": "900"
+            "quizTime": "900",
+            "type": "direct"
+        },
+
+    "english": 
+        {
+            "format": "fill in the blank",
+            "quizTime": "300",
+            "type": "fill in the blank"
         }
 
 }
