@@ -2,6 +2,7 @@ let timer;
 class GENQ {
 
     static trans(s){
+        s = s.toString();
         return s.split(" ").join("").toLowerCase();
     }
 
@@ -14,18 +15,18 @@ class GENQ {
             const files = ['questionBetter.json', 'Msettings.json'];
             const storageArea = ['questionDB', 'Qformats'];
             for (var i in files){
-            try{
-                var res = await fetch('./public/' + files[i]);
-                if (!res.ok){
-                    throw new Error('ahhhhhh'+ res.status)
-                }
-                GENQ[storageArea[i]] = await res.json();
-                console.log('success')
-            } catch{
-                console.log('failed to load ' + i);
+                try{
+                    var res = await fetch('./public/' + files[i]);
+                    if (!res.ok){
+                        throw new Error('ahhhhhh'+ res.status)
+                    }
+                    GENQ[storageArea[i]] = await res.json();
+                    console.log('success')
+                } catch{
+                    console.log('failed to load ' + i);
 
-                GENQ[files[i]] = {}
-            }
+                    GENQ[files[i]] = {}
+                }
             }
         }   
     }
@@ -129,7 +130,10 @@ class GENQ {
 
 }
 
-class question_asker {
+class question_asker { 
+    #q; //all questions
+    #selq
+    #admin
 
     constructor (){
         this.qLoc = 'time';
@@ -139,12 +143,13 @@ class question_asker {
         this.format = 
         this.quiz_r = new Map();
         this.i = 0;
-        this.q = Object.entries(GENQ.questionDB.time);
-        this.selq = this.q;
+        this.#q = Object.entries(GENQ.questionDB.time);
+        this.#selq = this.#q;
         this.correctness = '"cannot calculate" ';
         this.attempt = new Map();
-        this.quizResult = []
-        this.data = {'time': []}
+        this.quizResult = [];
+        this.data = {'time': []};
+        this.#admin = 'g9Rqahp5Knr6aQmdgEb1shl9vBltCjNGrh4VBI+e8JFxUm6szKkIe3WPeEL7hAyw';
     }
     //the class constructor
 
@@ -175,9 +180,28 @@ class question_asker {
         this.removeExtra()
     }
 
+    wrongOrRight(anwser, idx){
+        if (GENQ.trans(anwser) != '' ){ //make sure that anwser is not empty
+            console.log('good');
+            console.log(this.#selq);
+            console.log(`the index: ${idx}`, `${this.#selq[idx][1]}`)
+            if (GENQ.trans(anwser) == GENQ.trans(this.#selq[idx][1])){
+                console.log('true   TRUE')
+                return true;
+            } else{
+                console.log(anwser)
+                return false;
+            }
+        } else{
+            console.log('THe literal anwser IS' + anwser)
+            return null;
+        }
+        
+    }// anwser correct
+
     checkanwser(a){
         if (this.mode == 'practice'){
-        if (GENQ.trans(a) == GENQ.trans(this.q[this.i][1])){
+        if (this.wrongOrRight(a, this.i)){
             
                 this.r.push([this.i, 1, $('#null').val()])
                 this.saveData()
@@ -217,16 +241,15 @@ class question_asker {
         //inits question 
 
         $('.questiona').html('');
-        $('#ok').html(`question : ${this.i + 1}/${this.selq.length}`);
+        $('#ok').html(`question : ${this.i + 1}/${this.#selq.length}`);
         console.log(this.i)
         //updates the radar bar UI
-        console.log('current question: ' + this.selq[this.i],"i: " + this.i);
-        $('.questiona').html(this.selq[this.i][0])
+        console.log('current question: ' + this.#selq[this.i],"i: " + this.i);
+        $('.questiona').html(this.#selq[this.i][0])
         //debugs:
         // console.log(this.q.length)
         // console.log(GENQ.find(this.r, this.i, 0));
         
-        $('#null').css('color', 'black')
         $('#null').attr('placeholder', this.format)
         this.cal();
         
@@ -266,7 +289,11 @@ class question_asker {
 
         }
 
-    } 
+    }
+    
+    get selq(){
+        return this.#selq.length
+    }
     
 
     update_dynamic_ui(){
@@ -340,7 +367,7 @@ class question_asker {
         this.correctness = '"cannot calculate"';
         this.quiz_r.clear();
         this.quizResult = [];
-        this.selq = _.sampleSize(this.q, 10)
+        this.#selq = _.sampleSize(this.#q, 10)
         $('.quiz').addClass('selE')
         $('.practice').removeClass('selE')
 
@@ -356,7 +383,7 @@ class question_asker {
         //init all variables
         this.i = 0;
         this.correctness = '"cannot calculate"';
-        this.selq = this.q;
+        this.#selq = this.#q;
         clearTimer();
 
         $('.practice').addClass('selE')
@@ -368,15 +395,22 @@ class question_asker {
     changeModule(module){
         console.log('called')
         
-        this.q = Object.entries(GENQ.questionDB[module]);
+        this.#q = Object.entries(GENQ.questionDB[module]);
         this.qLoc = module
         this.format = GENQ.Qformats[module].format
         this.quizTime = Number(GENQ.Qformats[module].quizTime)
-        changeMode('practice', q)
+        changeMode('practice', this);
         this.r = (this.data[this.qLoc] || []);
         this.initForPractice();
         up(0, this)
-        console.log(this.q)
+    }
+
+    getAnswerWithAdminKey(pass, num){
+        if (pass = this.#admin){
+            return this.#selq[num][1];
+        } else{
+            return 'wrong key! 🤣😂😈😈';
+        }
     }
 
 }
@@ -391,7 +425,8 @@ function up(n, q){
 
     //make sure that cannot exceed limit
     
-    n = GENQ.inInterval(n, [0, q.selq.length-1])
+    n = GENQ.inInterval(n, [0, q.selq - 1]);
+    console.log('up to ' + q.selq)
 
     q.i = n;
 
@@ -402,8 +437,8 @@ function up(n, q){
         $('.back').css('visibility', 'visible')
     }
     //debug
-    console.log([n, q.selq.length-1])
-    if (n === (0 + q.selq.length-1)){
+    console.log([n, q.selq-1])
+    if (n === (0 + q.selq-1)){
         $('.next').css('visibility', 'hidden')
     } else{
         $('.next').css('visibility', 'visible')
@@ -461,27 +496,30 @@ function checkAllAnswer(q){
             clearTimer()
         }
         console.log('run')
-        if (q.quiz_r.size === q.selq.length){
+        console.log('size: ' + q.quiz_r.size)
+        if (q.quiz_r.size === q.selq){
             
-            console.log([...q.quiz_r])
-            for (var i = 0; i<q.selq.length; i++){
+            
+            for (var i = 0; i<q.selq; i++){
                 console.log(i)
-                console.log([...q.quiz_r]);
-                if (GENQ.trans(String([...q.quiz_r][i][1])) == GENQ.trans(String(q.selq[i][1]))){
-                    console.log('hi: ' + [...q.quiz_r][i])
-                    q.quizResult.push([i+1, [...q.quiz_r][i][1], '✔'])
+                console.log('the submited quiz in array form' + JSON.stringify([...q.quiz_r]));
+                if (q.wrongOrRight([...q.quiz_r].find(a => a[0] === i)[1], i)){
+
+                    q.quizResult.push([i+1, [...q.quiz_r].find(a => a[0] === i)[1], '✔']);
                 } else{
-                    console.log('hi: ' + [...q.quiz_r][i])
-                    q.quizResult.push([i+1, [...q.quiz_r][i][1], `correct anwser: ${String(q.selq[i][1])}`])
+                    console.log('hi: ' + [...q.quiz_r].find(a => a[0] === i))
+                    q.quizResult.push([i+1, [...q.quiz_r].find(a => a[0] === i)[1], `correct anwser: ${q.getAnswerWithAdminKey('g9Rqahp5Knr6aQmdgEb1shl9vBltCjNGrh4VBI+e8JFxUm6szKkIe3WPeEL7hAyw', i)}`])
                 }
             }
         } else{
             console.log('adding blank elements because undone')
-            for (var i = q.quiz_r.size; i < q.selq.length; i++){
-                console.log('setting...')
-                q.quiz_r.set(i, 'blank');
-                
+            for (var i = 0; i < q.selq; i++){
+                if (!q.quiz_r.has(i)){
+                    q.quiz_r.set(i, ' ')
+                }
             }
+
+            console.log(q.quiz_r);
 
             return checkAllAnswer(q)
         }
@@ -517,23 +555,16 @@ function clearTimer(){
 
 async function main(){
     await GENQ.load();
-    console.log(GENQ.Qformats, GENQ.questionDB)
+    //console.log(GENQ.Qformats, GENQ.questionDB)
+
+
+
+
+
+
     const q = new question_asker();
-    window.q = q
-    return q;
-}
-
-function changeMode(mode, q){
-    q.mode = mode;
-    up(q.i, q)
-}
 
 
-//---------------------------------------//
-
-
-//make sure that data is loaded before use 
-main().then((q)=>{
     q.initForPractice();
     $('.practice').addClass('selE')
     changeMode('practice', q)
@@ -595,7 +626,13 @@ main().then((q)=>{
             q.changeModule($(this).text());
         })
     })
+}
 
-});
+function changeMode(mode, q){
+    q.mode = mode;
+    up(q.i, q)
+}
 
 
+//---------------------------------------//
+main()
