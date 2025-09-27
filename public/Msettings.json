@@ -16,8 +16,9 @@
     "english": 
         {
             "format": "fill in the blank",
-            "quizTime": "300",
+            "quizTime": "600",
             "type": "fill in the blank"
         }
 
 }
+
